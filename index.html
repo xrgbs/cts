@@ -1,1 +1,158 @@
- <a href="https://browserleaks.com/javascript">Link</a> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Origin & Referrer Inspector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .inspector {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .data-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .data-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .data-label {
+            color: #ffd700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .data-value {
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            word-break: break-all;
+            line-height: 1.5;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .empty-value {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+        
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="inspector">
+        <div class="data-card">
+            <div class="data-label">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                Origin
+            </div>
+            <div class="data-value" id="origin"></div>
+        </div>
+        
+        <div class="data-card">
+            <div class="data-label">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+                Referrer
+            </div>
+            <div class="data-value" id="referrer"></div>
+        </div>
+        
+        <div class="data-card">
+            <div class="data-label">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H6.9C4.29 7 2.2 9.09 2.2 11.7v.6c0 2.61 2.09 4.7 4.7 4.7H11v-1.9H6.9c-1.71 0-3.1-1.39-3.1-3.1v-.6zm8.1 0c0 1.71 1.39 3.1 3.1 3.1H19v1.9h-3.9c-2.61 0-4.7-2.09-4.7-4.7v-.6c0-2.61 2.09-4.7 4.7-4.7H19V7h-3.9c-1.71 0-3.1 1.39-3.1 3.1v.6z"/>
+                </svg>
+                Current URL
+            </div>
+            <div class="data-value" id="currentUrl"></div>
+        </div>
+        
+        <div class="data-card">
+            <div class="data-label">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Protocol
+            </div>
+            <div class="data-value" id="protocol"></div>
+        </div>
+        
+        <div class="data-card">
+            <div class="data-label">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Host
+            </div>
+            <div class="data-value" id="host"></div>
+        </div>
+    </div>
+
+    <script>
+        function loadData() {
+            document.getElementById('origin').textContent = window.location.origin;
+            
+            const referrerElement = document.getElementById('referrer');
+            if (document.referrer) {
+                referrerElement.textContent = document.referrer;
+                referrerElement.classList.remove('empty-value');
+            } else {
+                referrerElement.textContent = 'No referrer detected';
+                referrerElement.classList.add('empty-value');
+            }
+            
+            document.getElementById('currentUrl').textContent = window.location.href;
+            document.getElementById('protocol').textContent = window.location.protocol;
+            document.getElementById('host').textContent = window.location.host;
+        }
+        
+        loadData();
+    </script>
+</body>
+</html>
